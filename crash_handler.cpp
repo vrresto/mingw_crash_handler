@@ -729,7 +729,6 @@ GenerateExceptionReport(PEXCEPTION_POINTERS pExceptionInfo)
         }
     }
 
-//FIXME
     dumpModules(hProcess);
 
     // TODO: Use GetFileVersionInfo on kernel32.dll as recommended on
