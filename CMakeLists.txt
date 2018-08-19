@@ -35,12 +35,12 @@ add_custom_command(
 
 add_custom_target(mgwhelp_import_lib DEPENDS ${mgwhelp_import_lib_file})
 
-add_library(crash_handler SHARED
+add_library(mingw_crash_handler SHARED
   exports.def
   crash_handler.cpp
 )
 
-add_dependencies(crash_handler mgwhelp_import_lib)
+add_dependencies(mingw_crash_handler mgwhelp_import_lib)
 
 target_link_libraries(mingw_crash_handler
   ${mgwhelp_import_lib_file}
