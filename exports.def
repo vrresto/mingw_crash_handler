@@ -1,2 +1,3 @@
 EXPORTS
   crashHandler
+  dumpStack

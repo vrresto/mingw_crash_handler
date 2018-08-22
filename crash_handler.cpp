@@ -773,6 +773,50 @@ Setup(void)
 
 extern "C"
 void
+dumpStack(const CONTEXT *pTargetContext)
+{
+  Setup();
+
+  if (!g_hReportFile) {
+      if (strcmp(g_szLogFileName, "-") == 0) {
+          g_hReportFile = GetStdHandle(STD_ERROR_HANDLE);
+          g_bOwnReportFile = FALSE;
+      } else {
+          g_hReportFile = CreateFileA(
+              g_szLogFileName,
+              GENERIC_WRITE,
+              FILE_SHARE_READ | FILE_SHARE_WRITE,
+              0,
+              OPEN_ALWAYS,
+              0,
+              0
+          );
+          g_bOwnReportFile = TRUE;
+      }
+  }
+
+  if (g_hReportFile) {
+      SetFilePointer(g_hReportFile, 0, 0, FILE_END);
+
+      HANDLE hProcess = GetCurrentProcess();
+
+      if (InitializeSym(hProcess, TRUE)) {
+
+          dumpStack(hProcess, GetCurrentThread(), pTargetContext);
+
+          if (!SymCleanup(hProcess)) {
+              assert(0);
+          }
+      }
+
+      FlushFileBuffers(g_hReportFile);
+  }
+
+}
+
+
+extern "C"
+void
 crashHandler(PEXCEPTION_POINTERS pExceptionInfo)
 {
     static LONG cBeenHere = 0;
