@@ -747,6 +747,9 @@ GenerateExceptionReport(PEXCEPTION_POINTERS pExceptionInfo)
 static void
 Setup(void)
 {
+    if (strlen(g_szLogFileName) != 0)
+        return;
+
     if (REPORT_FILE) {
         // Figure out what the report file will be named, and store it away
         if(GetModuleFileNameA(NULL, g_szLogFileName, MAX_PATH))
@@ -768,6 +771,15 @@ Setup(void)
             strcat(g_szLogFileName, "EXCHNDL.RPT");
         }
     }
+}
+
+
+
+extern "C"
+void
+setLogFileName(const char *name)
+{
+  strncpy(g_szLogFileName, name, sizeof(g_szLogFileName));
 }
 
 
@@ -797,6 +809,17 @@ dumpStack(const CONTEXT *pTargetContext)
 
   if (g_hReportFile) {
       SetFilePointer(g_hReportFile, 0, 0, FILE_END);
+
+      lprintf("-------------------\n\n");
+
+      SYSTEMTIME SystemTime;
+      GetLocalTime(&SystemTime);
+      char szDateStr[128];
+      LCID Locale = MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT);
+      GetDateFormatA(Locale, 0, &SystemTime, "dddd',' MMMM d',' yyyy", szDateStr, _countof(szDateStr));
+      char szTimeStr[128];
+      GetTimeFormatA(Locale, 0, &SystemTime, "HH':'mm':'ss", szTimeStr, _countof(szTimeStr));
+      lprintf("Error occurred on %s at %s.\n\n", szDateStr, szTimeStr);
 
       HANDLE hProcess = GetCurrentProcess();
 
