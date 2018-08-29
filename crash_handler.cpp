@@ -588,7 +588,7 @@ dumpStack(HANDLE hProcess, HANDLE hThread,
     }
 
 //FIXME
-    BOOL bInsideWine = true;
+    BOOL bInsideWine = false;
 //     isInsideWine();
 
     DWORD64 PrevFrameStackOffset = StackFrame.AddrStack.Offset - 1;
