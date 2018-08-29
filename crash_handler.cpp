@@ -885,3 +885,26 @@ crashHandler(PEXCEPTION_POINTERS pExceptionInfo)
     }
     InterlockedDecrement(&cBeenHere);
 }
+
+extern "C"
+void*
+getModuleBase(void *address)
+{
+  HANDLE hProcess = GetCurrentProcess();
+
+  HMODULE hModule = NULL;
+  BOOL bRet = GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                                  GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                  (char*)address,
+                                  &hModule);
+  if (bRet) {
+      return hModule;
+  }
+
+  MEMORY_BASIC_INFORMATION Buffer;
+  if (VirtualQueryEx(hProcess, address, &Buffer, sizeof Buffer) != 0) {
+      return Buffer.AllocationBase;
+  }
+
+  return (void*)(INT_PTR) SymGetModuleBase64(hProcess, (DWORD64)(INT_PTR)address);
+}

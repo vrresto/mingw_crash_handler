@@ -2,3 +2,4 @@ EXPORTS
   crashHandler
   dumpStack
   setLogFileName
+  getModuleBase
