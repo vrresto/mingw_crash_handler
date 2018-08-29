@@ -695,7 +695,7 @@ GenerateExceptionReport(PEXCEPTION_POINTERS pExceptionInfo)
     PEXCEPTION_RECORD pExceptionRecord = pExceptionInfo->ExceptionRecord;
 
     // Start out with a banner
-    lprintf("-------------------\n\n");
+    lprintf("-----------------------------------------------------------\n\n");
 
     SYSTEMTIME SystemTime;
     GetLocalTime(&SystemTime);
@@ -810,7 +810,7 @@ dumpStack(const CONTEXT *pTargetContext)
   if (g_hReportFile) {
       SetFilePointer(g_hReportFile, 0, 0, FILE_END);
 
-      lprintf("-------------------\n\n");
+      lprintf("-----------------------------------------------------------\n\n");
 
       SYSTEMTIME SystemTime;
       GetLocalTime(&SystemTime);
