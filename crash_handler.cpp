@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "mingw_crash_handler.h"
+
 #include <cstdio>
 #include <cassert>
 #include <windows.h>
@@ -774,18 +776,22 @@ Setup(void)
 }
 
 
+struct MingwCrashHandler : public MingwCrashHandlerInterface
+{
+  void crashHandler(PEXCEPTION_POINTERS pExceptionInfo) override;
+  void dumpStack(const CONTEXT*) override;
+  void setLogFileName(const char *name) override;
+  void* getModuleBase(void *address) override;
+};
 
-extern "C"
-void
-setLogFileName(const char *name)
+
+void MingwCrashHandler::setLogFileName(const char *name)
 {
   strncpy(g_szLogFileName, name, sizeof(g_szLogFileName));
 }
 
 
-extern "C"
-void
-dumpStack(const CONTEXT *pTargetContext)
+void MingwCrashHandler::dumpStack(const CONTEXT *pTargetContext)
 {
   Setup();
 
@@ -825,7 +831,7 @@ dumpStack(const CONTEXT *pTargetContext)
 
       if (InitializeSym(hProcess, TRUE)) {
 
-          dumpStack(hProcess, GetCurrentThread(), pTargetContext);
+          ::dumpStack(hProcess, GetCurrentThread(), pTargetContext);
 
           if (!SymCleanup(hProcess)) {
               assert(0);
@@ -838,9 +844,7 @@ dumpStack(const CONTEXT *pTargetContext)
 }
 
 
-extern "C"
-void
-crashHandler(PEXCEPTION_POINTERS pExceptionInfo)
+void MingwCrashHandler::crashHandler(PEXCEPTION_POINTERS pExceptionInfo)
 {
     static LONG cBeenHere = 0;
 
@@ -886,9 +890,8 @@ crashHandler(PEXCEPTION_POINTERS pExceptionInfo)
     InterlockedDecrement(&cBeenHere);
 }
 
-extern "C"
-void*
-getModuleBase(void *address)
+
+void* MingwCrashHandler::getModuleBase(void *address)
 {
   HANDLE hProcess = GetCurrentProcess();
 
@@ -908,3 +911,8 @@ getModuleBase(void *address)
 
   return (void*)(INT_PTR) SymGetModuleBase64(hProcess, (DWORD64)(INT_PTR)address);
 }
+
+
+extern "C" MingwCrashHandler mingw_crash_handler_interface;
+
+MingwCrashHandler mingw_crash_handler_interface;

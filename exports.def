@@ -1,5 +1,2 @@
 EXPORTS
-  crashHandler
-  dumpStack
-  setLogFileName
-  getModuleBase
+  mingw_crash_handler_interface
