@@ -288,7 +288,7 @@ dumpException(HANDLE hProcess,
 
     if(hModule && GetModuleFileNameA(hModule, szModule, sizeof szModule))
     {
-        lprintf(" in module %s", getBaseName(szModule));
+        lprintf(" in module %s", szModule);
     }
 
     // If the exception was an access violation, print out some additional information, to the error log and the debugger.
@@ -642,7 +642,7 @@ dumpStack(HANDLE hProcess, HANDLE hThread,
         if (hModule &&
             GetModuleFileNameA(hModule, szModule, MAX_PATH)) {
 
-            lprintf( "  %s", getBaseName(szModule));
+            lprintf( "  %s", szModule);
 
             bSymbol = GetSymFromAddr(hProcess, AddrPC + nudge, szSymName, MAX_SYM_NAME_SIZE);
             if (bSymbol) {
